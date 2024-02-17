@@ -37,7 +37,7 @@ class AzureCli:
             environ_vars = os.environ.copy()
 
         p = subprocess.Popen(cmds, stdout=stdout, stderr=stderr,
-                             cwd=None, shell=True)
+                             cwd=None)
         
         while p.poll() is None:
             if(isMultiline is True):
