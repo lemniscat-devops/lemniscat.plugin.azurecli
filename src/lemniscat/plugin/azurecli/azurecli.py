@@ -79,8 +79,10 @@ class AzureCli:
 
     def run_script(self, type, script):
         self.append_loginCommand(type)
-        return self.cmd([type, "-File", script])
+        return self.cmd([type, "-f", script])
 
     def run_script_with_args(self, type, script, args):
         self.append_loginCommand(type)
-        return self.cmd([type, "-File", script, args])
+        command = [type, "-f", script]
+        command.extend(args)
+        return self.cmd(command)

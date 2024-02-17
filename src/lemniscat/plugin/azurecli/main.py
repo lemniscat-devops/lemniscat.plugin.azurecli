@@ -54,8 +54,13 @@ class Action(PluginCore):
             self._logger.debug("---------------------------")
             result = cli.run(parameters['scripttype'], script)
         elif(parameters['commandtype'] == 'file'):
-            if(parameters.keys.__contains__('args')):
-                result = cli.run_script_with_args(parameters['scripttype'], parameters['filePath'], parameters['args'])
+            if(parameters.get('fileParams')) is not None:
+                params = parameters['fileParams']
+                args = []
+                for param in params:
+                    args.append(f'-{param}')
+                    args.append(self.__interpret(params[param], variables))
+                result = cli.run_script_with_args(parameters['scripttype'], parameters['filePath'], args)
             else:    
                 result= cli.run_script(parameters['scripttype'], parameters['filePath'])
         
