@@ -1,2 +1,2 @@
 # lemniscat.plugin.azurecli
-An Azure cli plugin for lemniscat
+A plugin to operate Azure services through Azure cli into a lemniscat workflow

@@ -1,0 +1,26 @@
+name: 'AzureCli Plugin'
+alias: 'azurecli'
+creator: 'pmorisseau'
+runtime:
+  main: 'main.py'
+  tests:
+    - 'tests/core.py'
+repository: ''
+description: 'azurecli plugin'
+version: '0.0.1'
+parameters:
+  - name: 'scripttype'
+    type: 'string'
+    default: 'pwsh'
+  - name: 'commandtype'
+    type: 'string'
+    default: 'InlineScript'
+  - name: 'filePath'
+    type: 'string'
+  - name: 'script'
+    type: 'string'
+requirements:
+  - name: 'PyYAML'
+    version: '6.0.1'
+  - name: 'pytz'
+    version: '2023.3'
