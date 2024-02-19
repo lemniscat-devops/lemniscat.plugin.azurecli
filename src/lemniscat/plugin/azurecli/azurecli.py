@@ -5,6 +5,7 @@ import logging
 import os
 import subprocess, sys   
 from lemniscat.core.util.helpers import LogUtil
+from lemniscat.core.model.models import VariableValue
 import re
 
 try:  # Python 2.7+
@@ -45,9 +46,12 @@ class AzureCli:
                 errors = p.stderr.readlines()
                 for line in lines:
                     ltrace = line.decode('utf-8').rstrip('\r\n')
-                    m = re.match(r"^\[lemniscat\.pushvar\] (?P<key>\w+)=(?P<value>.*)", str(ltrace))
+                    m = re.match(r"^\[lemniscat\.pushvar(?P<secret>\.secret)\] (?P<key>\w+)=(?P<value>.*)", str(ltrace))
                     if(not m is None):
-                        outputVar[m.group('key').strip()] = m.group('value').strip()
+                        if(m.group('secret') == '.secret'):
+                            outputVar[m.group('key').strip()] = VariableValue(m.group('value').strip(), True)
+                        else:
+                            outputVar[m.group('key').strip()] = VariableValue(m.group('value').strip())
                     else:
                         log.debug(f'  {ltrace}')
                 for error in errors:
@@ -61,9 +65,12 @@ class AzureCli:
                 error = p.stderr.readline()
                 if(line != b''):
                     ltrace = line.decode('utf-8').rstrip('\r\n')
-                    m = re.match(r"^\[lemniscat\.pushvar\] (?P<key>\w+)=(?P<value>.*)", str(ltrace))
+                    m = re.match(r"^\[lemniscat\.pushvar(?P<secret>\.secret)\] (?P<key>\w+)=(?P<value>.*)", str(ltrace))
                     if(not m is None):
-                        outputVar[m.group('key').strip()] = m.group('value').strip()
+                        if(m.group('secret') == '.secret'):
+                            outputVar[m.group('key').strip()] = VariableValue(m.group('value').strip(), True)
+                        else:
+                            outputVar[m.group('key').strip()] = VariableValue(m.group('value').strip())
                     else:
                         log.debug(f'  {ltrace}')
                 if(error != b''):

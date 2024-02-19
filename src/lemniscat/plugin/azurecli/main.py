@@ -6,7 +6,7 @@ import os
 import re
 from logging import Logger
 from lemniscat.core.contract.engine_contract import PluginCore
-from lemniscat.core.model.models import Meta, TaskResult
+from lemniscat.core.model.models import Meta, TaskResult, VariableValue
 from lemniscat.core.util.helpers import FileSystem, LogUtil
 
 from lemniscat.plugin.azurecli.azurecli import AzureCli
@@ -34,7 +34,7 @@ class Action(PluginCore):
                 for match in matches:
                     var = str.strip(match)
                     if(var in variables):
-                        script = script.replace(f'${{{{{match}}}}}', variables[var])
+                        script = script.replace(f'${{{{{match}}}}}', variables[var].value)
                         self._logger.debug(f"Interpreting variable: {var} -> {variables[var]}")
                     else:
                         script = script.replace(f'${{{{{match}}}}}', "")
@@ -109,4 +109,8 @@ if __name__ == "__main__":
     logger = LogUtil.create()
     action = Action(logger)
     __cli_args = __init_cli().parse_args()   
-    action.invoke(ast.literal_eval(__cli_args.parameters), ast.literal_eval(__cli_args.variables))
+    variables = {}   
+    vars = ast.literal_eval(__cli_args.variables)
+    for key in vars:
+        variables[key] = VariableValue(vars[key])
+    action.invoke(ast.literal_eval(__cli_args.parameters), variables)
