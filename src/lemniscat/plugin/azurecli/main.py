@@ -24,41 +24,25 @@ class Action(PluginCore):
             name=manifest_data['name'],
             description=manifest_data['description'],
             version=manifest_data['version']
-        )
-        
-    def __interpret(self, script: str, variables: dict) -> str:
-        if(script is None):
-            return None
-        if(isinstance(script, str)):
-            matches = re.findall(_REGEX_CAPTURE_VARIABLE, script)
-            if(len(matches) > 0):
-                for match in matches:
-                    var = str.strip(match)
-                    if(var in variables):
-                        script = script.replace(f'${{{{{match}}}}}', variables[var].value)
-                        self._logger.debug(f"Interpreting variable: {var} -> {variables[var]}")
-                    else:
-                        script = script.replace(f'${{{{{match}}}}}', "")
-                        self._logger.debug(f"Variable not found: {var}. Replaced by empty string.")
-        return script    
+        ) 
 
-    def __prepareVariables(self, variables: dict, withSecrets: bool = False) -> dict:
+    def __prepareVariables(self, withSecrets: bool = False) -> dict:
         result = {}
         
-        for key in variables:
+        for key in self.variables:
             if(withSecrets is True):
-                result[key] = variables[key].value
+                result[key] = self.variables[key].value
             else:
-                if(not variables[key].sensitive):
-                    result[key] = variables[key].value
+                if(not self.variables[key].sensitive):
+                    result[key] = self.variables[key].value
         return result
 
-    def __run_azurecli(self, parameters: dict = {}, variables: dict = {}) -> TaskResult:
+    def __run_azurecli(self) -> TaskResult:
         # launch azurecli command
         cli = AzureCli()
         result = {}
-        if(parameters.get('storeVariablesInFile') is not None):
-            config = parameters['storeVariablesInFile']
+        if(self.parameters.get('storeVariablesInFile') is not None):
+            config = self.parameters['storeVariablesInFile']
             format = 'json'
             if(config.get('format') is not None):
                 format = config['format']
@@ -66,7 +50,7 @@ class Action(PluginCore):
             if(config.get('withSecrets') is not None):
                 withSecrets = config['withSecrets']
             file = FileStore()
-            vars = self.__prepareVariables(variables, withSecrets)
+            vars = self.__prepareVariables(withSecrets)
             if(format == 'json'):
                 file.saveJsonFile(f'{os.getcwd()}/vars.json', vars)
                 self._logger.info(f'Variables saved to {os.getcwd()}/vars.json')
@@ -76,24 +60,24 @@ class Action(PluginCore):
             else:
                 raise ValueError(f'Format {format} is not supported.')
         
-        if(parameters['commandtype'] == 'inline'):
-            script = self.__interpret(parameters['script'], variables)
+        if(self.parameters['commandtype'] == 'inline'):
+            script = self.parameters['script']
             self._logger.debug("---------------------------")
             self._logger.debug("Interpreted script: ")
             script = script.replace("'", "\"")
             self._logger.debug(f"{script}")
             self._logger.debug("---------------------------")
-            result = cli.run(parameters['scripttype'], script)
-        elif(parameters['commandtype'] == 'file'):
-            if(parameters.get('fileParams')) is not None:
-                params = parameters['fileParams']
+            result = cli.run(self.parameters['scripttype'], script)
+        elif(self.parameters['commandtype'] == 'file'):
+            if(self.parameters.get('fileParams')) is not None:
+                params = self.parameters['fileParams']
                 args = []
                 for param in params:
                     args.append(f'-{param}')
-                    args.append(self.__interpret(params[param], variables))
-                result = cli.run_script_with_args(parameters['scripttype'], parameters['filePath'], args)
+                    args.append(params[param])
+                result = cli.run_script_with_args(self.parameters['scripttype'], self.parameters['filePath'], args)
             else:    
-                result= cli.run_script(parameters['scripttype'], parameters['filePath'])
+                result= cli.run_script(self.parameters['scripttype'], self.parameters['filePath'])
         
         if(result[3] is not None):   
             super().appendVariables(result[3])  
@@ -111,9 +95,10 @@ class Action(PluginCore):
         )
         
 
-    def invoke(self, parameters: dict = {}, variables: dict = {}) -> TaskResult:
-        self._logger.debug(f'Run AzureCli with {parameters["scripttype"]} -> {self.meta}')
-        task = self.__run_azurecli(parameters, variables)
+    def invoke(self, params: dict = {}, variables: dict = {}) -> TaskResult:
+        super().invoke(params, variables)
+        self._logger.debug(f'Run AzureCli with {self.parameters["scripttype"]} -> {self.meta}')
+        task = self.__run_azurecli()
         return task
     
     def test_logger(self) -> None:
