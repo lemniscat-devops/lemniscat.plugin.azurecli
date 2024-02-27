@@ -64,6 +64,12 @@ requirements:
 ### Running powershell commmands and pass variables through json file
 > [!NOTE] 
 > This feature is particulary recommand when you need to manipulate complexe variable with your task.
+> You can access to the variables in the json file by using the following command:
+> ```powershell
+> $location = Get-Location
+> $variables = Get-Content "$($location.path)/vars.json" | ConvertFrom-Json -Depth 100
+> ```
+
 ```yaml
 - task: azurecli
   displayName: 'Azure CLI'
