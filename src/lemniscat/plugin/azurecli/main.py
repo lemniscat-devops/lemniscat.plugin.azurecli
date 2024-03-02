@@ -36,6 +36,11 @@ class Action(PluginCore):
                 if(not self.variables[key].sensitive):
                     result[key] = self.variables[key].value
         return result
+    
+    def _replace_unresolved_variables(self, script: str) -> str:
+        # replace unresolved variables with empty string
+        self._logger.info("Unresolved variables will be replaced with empty string")
+        return re.sub(_REGEX_CAPTURE_VARIABLE, '', script)
 
     def __run_azurecli(self) -> TaskResult:
         # launch azurecli command
@@ -64,6 +69,7 @@ class Action(PluginCore):
             script = self.parameters['script']
             self._logger.debug("---------------------------")
             self._logger.debug("Interpreted script: ")
+            script = self._replace_unresolved_variables(script)
             script = script.replace("'", "\"")
             self._logger.debug(f"{script}")
             self._logger.debug("---------------------------")
