@@ -59,6 +59,7 @@ jobs:
         name: python-package-distributions
         path: dist/
     - name: Add git release tag
+      id: tag
       if: github.ref == 'refs/heads/main' # only tag on main branch
       run: | 
         git config --global user.email "runner@github.com"
