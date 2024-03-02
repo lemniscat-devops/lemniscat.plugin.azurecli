@@ -5,10 +5,10 @@ mode: ContinuousDelivery
 increment: Inherit
 continuous-delivery-fallback-tag: ci
 tag-prefix: '[vV]'
-major-version-bump-message: '\d+:\s?(breaking|major)'
-minor-version-bump-message: '\d+:\s?(feature|feat|minor)'
-patch-version-bump-message: '\d+:\s?(fix|hotfix|patch)'
-no-bump-message: '\d+:\s?(none|skip)'
+major-version-bump-message: '(breaking|major):'
+minor-version-bump-message: '(feature|feat|minor):'
+patch-version-bump-message: '(fix|hotfix|patch):'
+no-bump-message: '(none|skip):'
 legacy-semver-padding: 4
 build-metadata-padding: 4
 commits-since-version-source-padding: 4
