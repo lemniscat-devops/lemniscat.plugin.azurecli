@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "lemniscat.plugin.azurecli"
+version = "0.0.1"
+authors = [
+  { name="Philippe MORISSEAU", email="philippe.morisseau@outlook.com" },
+]
+description = "A lemniscat plugin to run azurecli scripts"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dynamic = ["dependencies"]
+
+[project.urls]
+Homepage = "https://github.com/lemniscat-devops/lemniscat.plugin.azurecli"
+Issues = "https://github.com/lemniscat-devops/lemniscat.plugin.azurecli/issues"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["lemniscat*"]
+
+[tool.setuptools.package-data]
+"lemniscat.plugin.azurecli" = ["plugin.yaml", "plugin.yml"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["src/lemniscat/plugin/azurecli/requirements.txt"]}
