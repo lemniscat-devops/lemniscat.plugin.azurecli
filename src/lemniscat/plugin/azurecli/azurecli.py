@@ -90,6 +90,7 @@ class AzureCli:
     
     def append_loginCommand(self, type):
         self.cmd([type, '-Command', "az config unset core.allow_broker"], True)
+        self.cmd([type, '-Command', "az config set extension.use_dynamic_install=yes_without_prompt"], True)
         self.cmd([type, '-Command', f"az login --service-principal -u {os.environ['ARM_CLIENT_ID']} -p {os.environ['ARM_CLIENT_SECRET']} --tenant {os.environ['ARM_TENANT_ID']}"], True)
         self.cmd([type, '-Command', f"az account set --subscription {os.environ['ARM_SUBSCRIPTION_ID']}"], True)
         
