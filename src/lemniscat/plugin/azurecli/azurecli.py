@@ -61,7 +61,7 @@ class AzureCli:
                         log.warning(f'  {line[1:]}')
                 if line[0] == '1':
                     ltrace = line[1:]
-                    m = re.match(r"^\[lemniscat\.pushvar(?P<secret>\.secret)?\] (?P<key>\w+)=(?P<value>.*)", str(ltrace))
+                    m = re.match(r"^\[lemniscat\.pushvar(?P<secret>\.secret)?\] (?P<key>[^=]+)=(?P<value>.*)", str(ltrace))
                     if(not m is None):
                         if(m.group('secret') == '.secret'):
                             outputVar[m.group('key').strip()] = VariableValue(m.group('value').strip(), True)
