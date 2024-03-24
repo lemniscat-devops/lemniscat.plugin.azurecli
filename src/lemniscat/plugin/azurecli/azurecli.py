@@ -35,13 +35,8 @@ class AzureCli:
     def cmd(self, cmds, **kwargs):
         outputVar = {}
         capture_output = kwargs.pop('capture_output', True)
-        is_env_vars_included = kwargs.pop('is_env_vars_included', False)
-        if capture_output is True:
-            stderr = subprocess.PIPE
-            stdout = subprocess.PIPE
-        else:
-            stderr = sys.stderr
-            stdout = sys.stdout
+        stderr = subprocess.PIPE
+        stdout = subprocess.PIPE
 
         p = subprocess.Popen(cmds, stdout=stdout, stderr=stderr,
                              cwd=None)
@@ -92,10 +87,12 @@ class AzureCli:
         return ret_code, out, err, outputVar
     
     def append_loginCommand(self, type):
-        self.cmd([type, '-Command', "az config unset core.allow_broker"])
-        self.cmd([type, '-Command', "az config set extension.use_dynamic_install=yes_without_prompt"])
-        self.cmd([type, '-Command', f"az login --service-principal -u {os.environ['ARM_CLIENT_ID']} -p {os.environ['ARM_CLIENT_SECRET']} --tenant {os.environ['ARM_TENANT_ID']}"])
-        self.cmd([type, '-Command', f"az account set --subscription {os.environ['ARM_SUBSCRIPTION_ID']}"])
+        log.info("Logging to Azure...")
+        self.cmd([type, '-Command', "az config unset core.allow_broker"], capture_output=False)
+        self.cmd([type, '-Command', "az config set extension.use_dynamic_install=yes_without_prompt"], capture_output=False)
+        self.cmd([type, '-Command', f"az login --service-principal -u {os.environ['ARM_CLIENT_ID']} -p {os.environ['ARM_CLIENT_SECRET']} --tenant {os.environ['ARM_TENANT_ID']}"], capture_output=False)
+        self.cmd([type, '-Command', f"az account set --subscription {os.environ['ARM_SUBSCRIPTION_ID']}"], capture_output=False)
+        log.info("Logged to Azure.")
         
     def run(self, type, command):
         self.append_loginCommand(type)
